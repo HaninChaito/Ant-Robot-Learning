@@ -11,8 +11,7 @@ print(f"Is CUDA available? {torch.cuda.is_available()}")
 print(f"Current device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
 
 def objective(trial):
-    # --- 1. HYPERPARAMETER SEARCH SPACE ---
-    # Environment Weights
+    
     fwd_w = trial.suggest_float("forward_reward_weight", 0.5, 2.0)
     ctrl_w = trial.suggest_float("ctrl_cost_weight", 0.01, 1.0)
     contact_w = trial.suggest_float("contact_cost_weight", 1e-4, 1e-2, log=True)
@@ -91,7 +90,6 @@ def objective(trial):
        train_env.close()
 
 if __name__ == "__main__":
-    # Create the database and study
     storage = "sqlite:///ant_tuning.db"
     study = optuna.create_study(
         study_name="ant_joint_optimization",
@@ -100,8 +98,7 @@ if __name__ == "__main__":
         load_if_exists=True
     )
 
-    # Resilient loop: ensures we reach 30 successful trials
-    trials_needed = 15
+    trials_needed = 30
     while len(study.get_trials(states=[optuna.trial.TrialState.COMPLETE])) < trials_needed:
         try:
             current_completed = len(study.get_trials(states=[optuna.trial.TrialState.COMPLETE]))
